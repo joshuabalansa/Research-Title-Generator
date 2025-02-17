@@ -108,7 +108,6 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    // Clear previous result before generating new one
     setResult(null);
 
     console.log('Submitting form with values:', { industry, projectType, difficulty });
@@ -119,16 +118,20 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
-          // Add Cache-Control header to prevent caching
-          "Cache-Control": "no-cache"
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0"
         },
         body: JSON.stringify({
           industry,
           projectType,
           difficulty,
-          // Add timestamp to ensure unique requests
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          random: Math.random() // Add additional randomness
         }),
+        // Add these fetch options
+        cache: 'no-store',
+        next: { revalidate: 0 }
       });
 
       const contentType = response.headers.get("content-type");

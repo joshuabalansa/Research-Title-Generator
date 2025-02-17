@@ -2,25 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateCapstoneTitle, validOptions } from "../../lib/ai";
 import type { CapstoneProject } from "../../lib/ai";
 
+// Add this export to prevent response caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST(req: NextRequest) {
+  // Add CORS and cache prevention headers
+  const headers = {
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'Surrogate-Control': 'no-store'
+  };
+
   try {
     const body = await req.json();
     const { industry, projectType, difficulty } = body;
 
-    console.log('Received request with body:', { industry, projectType, difficulty });
+    console.log('Received request with body:', { industry, projectType, difficulty, timestamp: Date.now() });
 
     // Validate request body
     if (!industry || !projectType || !difficulty) {
       console.log('Missing required fields');
       return NextResponse.json(
         { error: "All fields (industry, projectType, difficulty) are required." },
-        {
-          status: 400,
-          headers: {
-            'Cache-Control': 'no-store, no-cache, must-revalidate',
-            'Pragma': 'no-cache'
-          }
-        }
+        { status: 400, headers }
       );
     }
 
@@ -58,23 +64,12 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('Generated capstone project:', capstoneProject);
-    return NextResponse.json(capstoneProject, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
-        'Pragma': 'no-cache'
-      }
-    });
+    return NextResponse.json(capstoneProject, { headers });
   } catch (error) {
     console.error("Error generating capstone project:", error);
     return NextResponse.json({
       error: error instanceof Error ? error.message : "Internal Server Error",
       details: process.env.NODE_ENV === 'development' ? error : undefined
-    }, {
-      status: 500,
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
-        'Pragma': 'no-cache'
-      }
-    });
+    }, { status: 500, headers });
   }
 }
