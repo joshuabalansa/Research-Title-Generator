@@ -1,101 +1,240 @@
-import Image from "next/image";
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import type { CapstoneProject } from "./lib/ai";  // Import the type
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [industry, setIndustry] = useState("");
+  const [projectType, setProjectType] = useState("");
+  const [difficulty, setDifficulty] = useState("");
+  const [result, setResult] = useState<CapstoneProject | null>(null);  // Use proper typing
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const industries = [
+    // 🌍 Core Industries
+    "Technology",
+    "Healthcare",
+    "Education",
+    "Finance",
+    "Agriculture",
+    "Retail",
+    "Manufacturing",
+    "Engineering",
+    "Environmental Science",
+    "Business & Management",
+
+    // 🔒 Security & Law
+    "Cybersecurity",
+    "Law & Policy",
+    "Public Safety & Emergency Services",
+    "Defense & Military",
+
+    // 🚗 Transportation & Logistics
+    "Automotive",
+    "Transportation & Logistics",
+    "Aviation & Aerospace",
+    "Maritime & Shipping",
+
+    // ⚡ Energy & Sustainability
+    "Energy & Renewable Resources",
+    "Oil & Gas",
+    "Environmental Sustainability",
+
+    // 🎨 Media, Arts & Entertainment
+    "Media & Entertainment",
+    "Film & Television",
+    "Music & Audio Production",
+    "Graphic Design & Animation",
+    "Publishing & Journalism",
+
+    // 🏨 Hospitality & Tourism
+    "Hospitality & Tourism",
+    "Food & Beverage",
+    "Event Management",
+
+    // ⚕️ Life Sciences & Research
+    "Pharmaceuticals",
+    "Biotechnology",
+    "Medical Devices",
+    "Neuroscience & Psychology",
+
+    // 🏗️ Construction & Urban Development
+    "Construction & Architecture",
+    "Real Estate",
+    "Urban Planning",
+
+    // 🌐 Internet & Emerging Tech
+    "E-Commerce",
+    "AI & Machine Learning",
+    "Blockchain & Cryptocurrency",
+    "Cloud Computing",
+    "IoT (Internet of Things)",
+
+    // 🎮 Gaming & Digital Economy
+    "Gaming & Esports",
+    "Metaverse & Virtual Reality",
+    "Streaming & Content Creation",
+
+    // 🏋️‍♂️ Sports & Health
+    "Sports & Fitness",
+    "Wellness & Mental Health",
+    "Rehabilitation & Physical Therapy",
+
+    // 🔬 Science & Innovation
+    "Astronomy & Space Exploration",
+    "Nanotechnology",
+    "Quantum Computing",
+    "Material Science",
+
+    // 📊 Economics & Market Trends
+    "Stock Market & Investment",
+    "Insurance",
+    "Actuarial Science",
+
+    // 🏛️ Public & Nonprofit Sectors
+    "Social Services",
+    "Nonprofit & Philanthropy",
+    "Government & Public Administration",
+    "International Relations & Diplomacy"
+  ];
+
+
+  const projectTypes = ["Data", "Web", "Mobile", "IoT", "AI/ML", "Blockchain", "Cloud", "Cybersecurity"];
+  const difficultyLevels = ["Beginner", "Intermediate", "Advanced"];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    // Clear previous result before generating new one
+    setResult(null);
+
+    console.log('Submitting form with values:', { industry, projectType, difficulty });
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          // Add Cache-Control header to prevent caching
+          "Cache-Control": "no-cache"
+        },
+        body: JSON.stringify({
+          industry,
+          projectType,
+          difficulty,
+          // Add timestamp to ensure unique requests
+          timestamp: Date.now()
+        }),
+      });
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server returned non-JSON response");
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate capstone project');
+      }
+
+      console.log('Received response:', data);
+      setResult(data);
+    } catch (err) {
+      console.error('Error in form submission:', err);
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
+          Research Title Generator
+        </h1>
+        <h1 className="text-sm text-center text-gray-800 mb-4">
+        <div>Made with ♥ by <Link href={'https://balansajoshua.vercel.app/'}>JoshuaB</Link></div>
+        </h1>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Industry Select */}
+          <div>
+            <label className="block font-medium text-gray-700">Industry</label>
+            <select
+              value={industry}
+              onChange={(e) => setIndustry(e.target.value)}
+              className="w-full border-gray-300 rounded-lg p-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Select Industry</option>
+              {industries.map((ind) => (
+                <option key={ind} value={ind.toLowerCase()}>{ind}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Project Type Select */}
+          <div>
+            <label className="block font-medium text-gray-700">Project Type</label>
+            <select
+              value={projectType}
+              onChange={(e) => setProjectType(e.target.value)}
+              className="w-full border-gray-300 rounded-lg p-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Select Project Type</option>
+              {projectTypes.map((type) => (
+                <option key={type} value={type.toLowerCase()}>{type}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Difficulty Select */}
+          <div>
+            <label className="block font-medium text-gray-700">Difficulty</label>
+            <select
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value)}
+              className="w-full border-gray-300 rounded-lg p-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Select Difficulty</option>
+              {difficultyLevels.map((level) => (
+                <option key={level} value={level.toLowerCase()}>{level}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+            disabled={loading}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            {loading ? "Generating..." : "Generate Research Title"}
+          </button>
+        </form>
+
+        {/* Error Message */}
+        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+
+        {/* Result Section */}
+        {result && (
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow">
+            <h2 className="text-xl font-semibold text-gray-800">{result.project_title}</h2>
+            <p className="text-gray-600 mt-2">{result.description}</p>
+            <h3 className="text-lg font-medium mt-4">Objectives:</h3>
+            <ul className="list-disc pl-5 mt-2 text-gray-700">
+              {result.objectives.map((obj: string, index: number) => (
+                <li key={index}>{obj}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
