@@ -162,7 +162,7 @@ export default function Home() {
           Research Title Generator
         </h1>
         <h1 className="text-sm text-center text-gray-800 mb-4">
-        <div>Made with ♥ by <Link href={'https://balansajoshua.vercel.app/'}>JoshuaB</Link></div>
+        <div>Made with ♥ by <Link className="font-bold" href={'https://balansajoshua.vercel.app/'}>JoshuaB</Link></div>
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
