@@ -11,6 +11,25 @@ export default function Home() {
   const [result, setResult] = useState<CapstoneProject | null>(null);  // Use proper typing
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadingMessage, setLoadingMessage] = useState("Generating...")
+
+
+  const loadingMessages = [
+    "Thinking of a brilliant title...",
+    "Analyzing the best research ideas...",
+    "Compiling innovative topics...",
+    "Brainstorming an impactful project...",
+    "Exploring new research frontiers...",
+    "Unleashing creativity...",
+    "Your research breakthrough is coming...",
+    "Scanning the academic universe...",
+    "Letting AI work its magic...",
+    "Formulating an insightful title...",
+  ];
+
+  const getRandomLoadingMessage = () => {
+    return loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+  };
 
   const industries = [
     // 🌍 Core Industries
@@ -109,6 +128,7 @@ export default function Home() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setLoadingMessage(getRandomLoadingMessage());
 
     console.log('Submitting form with values:', { industry, projectType, difficulty });
 
@@ -217,7 +237,7 @@ export default function Home() {
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300"
             disabled={loading}
           >
-            {loading ? "Generating..." : "Generate Research Title"}
+            {loading ? loadingMessage : "Generate Research Title"}
           </button>
         </form>
 
