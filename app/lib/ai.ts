@@ -74,7 +74,6 @@ const generationConfig = {
   responseMimeType: "application/json",
 };
 
-// Add interface for the response structure
 interface CapstoneProject {
   project_title: string;
   description: string;

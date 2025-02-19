@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { CapstoneProject } from "./lib/ai";  // Import the type
+import industriesData from "./data/industries.json";  // Import the industries JSON
 
 export default function Home() {
   const [industry, setIndustry] = useState("");
@@ -11,8 +12,7 @@ export default function Home() {
   const [result, setResult] = useState<CapstoneProject | null>(null);  // Use proper typing
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loadingMessage, setLoadingMessage] = useState("Generating...")
-
+  const [loadingMessage, setLoadingMessage] = useState("Generating...");
 
   const loadingMessages = [
     "Thinking of a brilliant title...",
@@ -31,94 +31,7 @@ export default function Home() {
     return loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
   };
 
-  const industries = [
-    // 🌍 Core Industries
-    "Technology",
-    "Healthcare",
-    "Education",
-    "Finance",
-    "Agriculture",
-    "Retail",
-    "Manufacturing",
-    "Engineering",
-    "Environmental Science",
-    "Business & Management",
-
-    // 🔒 Security & Law
-    "Cybersecurity",
-    "Law & Policy",
-    "Public Safety & Emergency Services",
-    "Defense & Military",
-
-    // 🚗 Transportation & Logistics
-    "Automotive",
-    "Transportation & Logistics",
-    "Aviation & Aerospace",
-    "Maritime & Shipping",
-
-    // ⚡ Energy & Sustainability
-    "Energy & Renewable Resources",
-    "Oil & Gas",
-    "Environmental Sustainability",
-
-    // 🎨 Media, Arts & Entertainment
-    "Media & Entertainment",
-    "Film & Television",
-    "Music & Audio Production",
-    "Graphic Design & Animation",
-    "Publishing & Journalism",
-
-    // 🏨 Hospitality & Tourism
-    "Hospitality & Tourism",
-    "Food & Beverage",
-    "Event Management",
-
-    // ⚕️ Life Sciences & Research
-    "Pharmaceuticals",
-    "Biotechnology",
-    "Medical Devices",
-    "Neuroscience & Psychology",
-
-    // 🏗️ Construction & Urban Development
-    "Construction & Architecture",
-    "Real Estate",
-    "Urban Planning",
-
-    // 🌐 Internet & Emerging Tech
-    "E-Commerce",
-    "AI & Machine Learning",
-    "Blockchain & Cryptocurrency",
-    "Cloud Computing",
-    "IoT (Internet of Things)",
-
-    // 🎮 Gaming & Digital Economy
-    "Gaming & Esports",
-    "Metaverse & Virtual Reality",
-    "Streaming & Content Creation",
-
-    // 🏋️‍♂️ Sports & Health
-    "Sports & Fitness",
-    "Wellness & Mental Health",
-    "Rehabilitation & Physical Therapy",
-
-    // 🔬 Science & Innovation
-    "Astronomy & Space Exploration",
-    "Nanotechnology",
-    "Quantum Computing",
-    "Material Science",
-
-    // 📊 Economics & Market Trends
-    "Stock Market & Investment",
-    "Insurance",
-    "Actuarial Science",
-
-    // 🏛️ Public & Nonprofit Sectors
-    "Social Services",
-    "Nonprofit & Philanthropy",
-    "Government & Public Administration",
-    "International Relations & Diplomacy"
-  ];
-
+  const industries = industriesData.industries;
 
   const projectTypes = ["Data", "Web", "Mobile", "IoT", "AI/ML", "Blockchain", "Cloud", "Cybersecurity"];
   const difficultyLevels = ["Beginner", "Intermediate", "Advanced"];
@@ -176,87 +89,116 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
-          Research Title Generator
-        </h1>
-        <h1 className="text-sm text-center text-gray-800 mb-4">
-        <div>Made with ♥ by <Link className="font-bold" href={'https://balansajoshua.vercel.app/'}>JoshuaB</Link></div>
-        </h1>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-6xl bg-white lg:shadow-md rounded-lg p-6 flex flex-col md:flex-row">
+        {/* Form Section */}
+        <div className="w-full md:w-1/2 md:pr-4">
+          <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
+            Research Title Generator
+          </h1>
+          <h1 className="text-sm text-center text-gray-800 mb-4">
+            <div>Developed by <Link className="font-bold" href={'https://balansajoshua.vercel.app/'}>JOSH</Link></div>
+          </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Industry Select */}
-          <div>
-            <label className="block font-medium text-gray-700">Industry</label>
-            <select
-              value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
-              className="w-full border-gray-300 rounded-lg p-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Industry Select */}
+            <div>
+              <label className="block font-medium text-gray-700">Industry</label>
+              <select
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+                className="w-full border-gray-300 rounded-lg p-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select Industry</option>
+                {industries.map((ind) => (
+                  <option key={ind} value={ind.toLowerCase()}>{ind}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Project Type Select */}
+            <div>
+              <label className="block font-medium text-gray-700">Project Type</label>
+              <select
+                value={projectType}
+                onChange={(e) => setProjectType(e.target.value)}
+                className="w-full border-gray-300 rounded-lg p-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select Project Type</option>
+                {projectTypes.map((type) => (
+                  <option key={type} value={type.toLowerCase()}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Difficulty Radio Buttons */}
+            <div>
+              <label className="block font-medium text-gray-700 mb-2">Difficulty</label>
+              <div className="space-y-2">
+                {difficultyLevels.map((level) => (
+                  <div key={level} className="flex items-center">
+                    <input
+                      id={`radio-${level}`}
+                      type="radio"
+                      name="difficulty"
+                      value={level.toLowerCase()}
+                      checked={difficulty === level.toLowerCase()}
+                      onChange={(e) => setDifficulty(e.target.value)}
+                      className="hidden checked:bg-no-repeat checked:bg-center checked:border-indigo-500 checked:bg-indigo-100"
+                    />
+                    <label
+                      htmlFor={`radio-${level}`}
+                      className="flex items-center cursor-pointer text-gray-600 text-sm font-normal"
+                    >
+                      <span className={`border border-gray-300 rounded-full mr-2 w-4 h-4 flex items-center justify-center ${
+                        difficulty === level.toLowerCase() ? 'border-indigo-500 bg-indigo-100' : ''
+                      }`}>
+                        {difficulty === level.toLowerCase() && (
+                          <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        )}
+                      </span>
+                      {level}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+              disabled={loading}
             >
-              <option value="">Select Industry</option>
-              {industries.map((ind) => (
-                <option key={ind} value={ind.toLowerCase()}>{ind}</option>
-              ))}
-            </select>
-          </div>
+              Generate Research Title
+            </button>
+          </form>
 
-          {/* Project Type Select */}
-          <div>
-            <label className="block font-medium text-gray-700">Project Type</label>
-            <select
-              value={projectType}
-              onChange={(e) => setProjectType(e.target.value)}
-              className="w-full border-gray-300 rounded-lg p-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select Project Type</option>
-              {projectTypes.map((type) => (
-                <option key={type} value={type.toLowerCase()}>{type}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Difficulty Select */}
-          <div>
-            <label className="block font-medium text-gray-700">Difficulty</label>
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full border-gray-300 rounded-lg p-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select Difficulty</option>
-              {difficultyLevels.map((level) => (
-                <option key={level} value={level.toLowerCase()}>{level}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300"
-            disabled={loading}
-          >
-            {loading ? loadingMessage : "Generate Research Title"}
-          </button>
-        </form>
-
-        {/* Error Message */}
-        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+          {/* Error Message */}
+          {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+        </div>
 
         {/* Result Section */}
-        {result && (
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow">
-            <h2 className="text-xl font-semibold text-gray-800">{result.project_title}</h2>
-            <p className="text-gray-600 mt-2">{result.description}</p>
-            <h3 className="text-lg font-medium mt-4">Objectives:</h3>
-            <ul className="list-disc pl-5 mt-2 text-gray-700">
-              {result.objectives.map((obj: string, index: number) => (
-                <li key={index}>{obj}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <div className="w-full md:w-1/2 md:pl-4 mt-6 md:mt-0 flex items-center justify-center">
+          {loading ? (
+            <div className="p-4 rounded-lg flex items-center justify-center h-full">
+              <p className="text-lg font-medium text-gray-800">{loadingMessage}</p>
+            </div>
+          ) : (
+            result && (
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h2 className="text-xl font-semibold text-gray-800">{result.project_title}</h2>
+                <p className="text-gray-600 mt-2">{result.description}</p>
+                <h3 className="text-lg font-medium mt-4">Objectives:</h3>
+                <ul className="list-disc pl-5 mt-2 text-gray-700">
+                  {result.objectives.map((obj: string, index: number) => (
+                    <li key={index}>{obj}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          )}
+        </div>
       </div>
     </div>
   );
